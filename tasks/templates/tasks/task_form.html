@@ -1,0 +1,26 @@
+{% extends "tasks/base.html" %}
+
+{% block title %}{{ page_title }} | My To-Do List{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <div class="form-heading">
+        <h1>{{ page_title }}</h1>
+        <p>{% if task %}Update the details for this task.{% else %}Add a task to your daily list.{% endif %}</p>
+    </div>
+    <form method="post" class="task-form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="field {% if field.name == 'completed' %}checkbox-field{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button class="button button-primary" type="submit">Save Task</button>
+            <a class="button button-cancel" href="{% url 'task_list' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

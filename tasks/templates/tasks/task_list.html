@@ -1,0 +1,50 @@
+{% extends "tasks/base.html" %}
+
+{% block content %}
+<section class="task-section">
+    <div class="section-heading">
+        <div>
+            <h1>All Tasks</h1>
+            <p>Manage your daily work in one place.</p>
+        </div>
+        <span class="task-count">{{ tasks|length }} task{{ tasks|length|pluralize }}</span>
+    </div>
+
+    {% if tasks %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Title</th><th>Description</th><th>Created</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                        <tr class="{% if task.completed %}completed-row{% else %}pending-row{% endif %}">
+                            <td class="task-title">{{ task.title }}</td>
+                            <td>{{ task.description|default:"No description provided."|linebreaksbr }}</td>
+                            <td>{{ task.created_at|date:"d M Y, h:i A" }}</td>
+                            <td><span class="status {% if task.completed %}completed{% else %}pending{% endif %}">{% if task.completed %}Completed{% else %}Pending{% endif %}</span></td>
+                            <td class="actions">
+                                <a class="button button-edit" href="{% url 'edit_task' task.pk %}">Edit</a>
+                                <form method="post" action="{% url 'toggle_task_status' task.pk %}">
+                                    {% csrf_token %}
+                                    <button class="button button-status" type="submit">{% if task.completed %}Mark Pending{% else %}Complete{% endif %}</button>
+                                </form>
+                                <form method="post" action="{% url 'delete_task' task.pk %}" onsubmit="return confirm('Delete this task?');">
+                                    {% csrf_token %}
+                                    <button class="button button-delete" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h2>No tasks available</h2>
+            <p>Your list is empty. Add a task to get started.</p>
+            <a class="button button-primary" href="{% url 'add_task' %}">Add Your First Task</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
